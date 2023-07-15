@@ -14,6 +14,7 @@ class DragDropPdfApp(MDApp):
         super().__init__(**kwargs)
         self.source_file_name = "Null"
         self.desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop', 'MedasPDF')
+        self.temporary_path = os.path.join(os.path.expanduser('~'), 'Desktop', 'MedasPDF', 'temporary')
         self.screen = Builder.load_file('./main.kv')
 
     def build(self):
@@ -44,16 +45,26 @@ class DragDropPdfApp(MDApp):
         except FileExistsError:
             return True
 
+    def create_temporary_path(self) -> bool:
+        try:
+            os.makedirs(self.temporary_path)
+            return True
+        except FileExistsError:
+            return True
+
     def start_parse(self):
         input_pdf = PdfReader(open(self.source_file_name, "rb"))
         for i in range(len(input_pdf.pages)):
             output = PdfWriter()
             output.add_page(input_pdf.pages[i])
-            with open("./temporary/%s.pdf" % i, "wb") as outputStream:
-                output.write(outputStream)
+            if self.create_temporary_path():
+                with open(f"{self.temporary_path}/{i}.pdf", "wb") as outputStream:
+                    output.write(outputStream)
+            else:
+                toast("Dosya yazma sistemi hatası var")
 
         for k in range(len(input_pdf.pages)):
-            pdf_name = "./temporary/" + str(k) + ".pdf"
+            pdf_name = f"{self.temporary_path}/" + str(k) + ".pdf"
             reader = PdfReader(pdf_name)
             read_page = reader.pages[0]
             first_extracted_part = read_page.extract_text()
@@ -70,11 +81,13 @@ class DragDropPdfApp(MDApp):
                     output.write(outputStream)
                     self.root.ids.progress_bar.value = 100 * (k + 1) / len(input_pdf.pages)
             else:
-                toast('Dosya sistemi hatası var')
-        for file_name in os.listdir('./temporary'):
-            file_path = os.path.join('./temporary', file_name)
+                toast('Dosya yazma sistemi hatası var')
+        for file_name in os.listdir(self.temporary_path):
+            file_path = os.path.join(self.temporary_path, file_name)
             if os.path.isfile(file_path):
                 os.remove(file_path)
+        if os.path.isdir(self.temporary_path):
+            os.rmdir(self.temporary_path)
 
 
 if __name__ == '__main__':
