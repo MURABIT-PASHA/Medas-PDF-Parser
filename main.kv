@@ -1,0 +1,54 @@
+#:import toast kivymd.toast.toast
+#:import Toolbar kivymd.uix.toolbar.MDTopAppBar
+MDScreen:
+    FloatLayout:
+        MDBoxLayout:
+            orientation: 'vertical'
+            spacing: 10
+            MDTopAppBar:
+                title: "Created by Murabıt Akdoğan"
+                md_bg_color: app.theme_cls.primary_color
+                elevation: 5
+            ScreenManager:
+                id:screen_manager
+                Screen:
+                    MDBoxLayout:
+                        size_hint: (1,1)
+                        pos_hint: {'center_x':.5, 'center_y':.5}
+                        orientation: 'horizontal'
+                        spacing: 10
+                        MDBoxLayout:
+                            size_hint: (1,1)
+                            padding: "10dp"
+                            pos_hint: {'center_x':.5, 'center_y':.5}
+                            orientation: 'vertical'
+                            MDBoxLayout:
+                                size_hint: (1,1)
+                                canvas.before:
+                                    Color:
+                                        rgba: 1, 1, 1, 1
+                                    Line:
+                                        width: 1
+                                        rectangle: self.x, self.y, self.width, self.height
+
+                                Label:
+                                    pos_hint: {'center_x':.5, 'center_y':.5}
+                                    text: "Dosyanızı buraya sürükleyin"
+                            MDBoxLayout:
+                                size_hint: (1,.5)
+                                padding: "10dp"
+                                MDRaisedButton:
+                                    size_hint:(.5,None)
+                                    height: 50
+                                    pos_hint: {'center_x':.5, 'center_y':.8}
+                                    id: language_button
+                                    text: "Parçala"
+                                    on_release: app.start_long_running_task()
+                            MDBoxLayout:
+                                size_hint: (1, .1)
+                                padding: "10dp"
+                                MDProgressBar:
+                                    id: progress_bar
+                                    orientation: "horizontal"
+                                    value: 0
+                                    max: 100
